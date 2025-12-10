@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Instance;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -46,7 +47,15 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
+
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
+
+        yield MenuItem::section('Paramètre');
+        yield MenuItem::subMenu('Instances', 'fas fa-layer-group')->setSubItems([
+            MenuItem::linkToCrud('Liste des instances', 'fas fa-list', Instance::class),
+            MenuItem::linkToRoute('Importer des instances', 'fas fa-file-import', 'admin_import_excel_instances')
+        ]);
+
         yield MenuItem::section('Sécurité');
         yield MenuItem::linkToCrud('Utilisateur', 'fa fa-users', User::class);
     }
