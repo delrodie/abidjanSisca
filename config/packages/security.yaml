@@ -3,6 +3,7 @@ security:
         ROLE_GROUPE: ROLE_USER
         ROLE_DISTRICT: ROLE_GROUPE
         ROLE_REGION: ROLE_DISTRICT
+        ROLE_ADMIN: ROLE_REGION
         ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
 
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
@@ -55,7 +56,7 @@ security:
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
+         - { path: ^/admin, roles: ROLE_GROUPE }
         # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:

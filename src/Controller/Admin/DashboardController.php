@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Instance;
+use App\Entity\Organe;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -50,14 +51,20 @@ class DashboardController extends AbstractDashboardController
 
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
 
-        yield MenuItem::section('Paramètre');
-        yield MenuItem::subMenu('Instances', 'fas fa-layer-group')->setSubItems([
-            MenuItem::linkToCrud('Liste des instances', 'fas fa-list', Instance::class),
-            MenuItem::linkToRoute('Importer des instances', 'fas fa-file-import', 'admin_import_excel_instances')
-        ]);
+        if ($this->isGranted('ROLE_ADMIN')){
 
-        yield MenuItem::section('Sécurité');
-        yield MenuItem::linkToCrud('Utilisateur', 'fa fa-users', User::class);
+            yield MenuItem::section('Paramètre');
+            yield MenuItem::subMenu('Instances', 'fas fa-layer-group')->setSubItems([
+                MenuItem::linkToCrud('Liste des instances', 'fas fa-list', Instance::class),
+                MenuItem::linkToRoute('Importer des instances', 'fas fa-file-import', 'admin_import_excel_instances')
+            ]);
+            yield MenuItem::linkToCrud('Organes', 'fas fa-layer-group', Organe::class);
+
+            yield MenuItem::section('Sécurité');
+            yield MenuItem::linkToCrud('Utilisateur', 'fa fa-users', User::class);
+
+        }
+
     }
 
 
