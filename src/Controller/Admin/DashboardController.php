@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Instance;
 use App\Entity\Organe;
 use App\Entity\User;
+use App\Entity\Utilisateur;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -49,7 +50,7 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
 
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
+        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class); <i class=""></i>
 
         if ($this->isGranted('ROLE_ADMIN')){
 
@@ -61,7 +62,12 @@ class DashboardController extends AbstractDashboardController
             yield MenuItem::linkToCrud('Organes', 'fas fa-layer-group', Organe::class);
 
             yield MenuItem::section('Sécurité');
-            yield MenuItem::linkToCrud('Utilisateur', 'fa fa-users', User::class);
+            yield MenuItem::subMenu('Comptes', 'fa-solid fa-user-lock')->setSubItems([
+                MenuItem::linkToCrud('Liste des comptes', 'fas fa-list', Utilisateur::class),
+                MenuItem::linkToRoute('Générer des comptes', 'fa-solid fa-user-clock', 'admin_compte_generation')
+            ]);
+            yield MenuItem::linkToCrud('Users', 'fa-solid fa-user-shield', User::class)
+                ->setPermission('ROLE_SUPER_ADMIN');
 
         }
 
