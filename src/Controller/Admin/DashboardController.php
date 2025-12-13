@@ -66,7 +66,7 @@ class DashboardController extends AbstractDashboardController
             yield MenuItem::section('Sécurité');
             yield MenuItem::subMenu('Comptes', 'fa-solid fa-user-lock')->setSubItems([
                 MenuItem::linkToCrud('Liste des comptes', 'fas fa-list', Utilisateur::class),
-                MenuItem::linkToRoute('Générer des comptes', 'fa-solid fa-user-clock', 'admin_compte_generation')
+                MenuItem::linkToRoute('Générer des comptes', 'fa-solid fa-user-clock', 'admin_generate_compte')
                             ->setPermission('ROLE_SUPER_ADMIN')
             ]);
             yield MenuItem::linkToCrud('Users', 'fa-solid fa-user-shield', User::class)

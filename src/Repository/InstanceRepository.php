@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Instance;
+use App\Entity\Utilisateur;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -39,6 +40,16 @@ class InstanceRepository extends ServiceEntityRepository
 
         return $query->getQuery()->getResult();
     }
+
+    public function findAllNotCompte()
+    {
+        return $this->createQueryBuilder('i')
+            ->leftJoin(Utilisateur::class, 'u', 'WITH', 'u.instance = i.id')
+            ->where('u.id IS NULL')
+            ->getQuery()
+            ->getResult();
+    }
+
 
     //    /**
     //     * @return Instance[] Returns an array of Instance objects

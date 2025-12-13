@@ -1,0 +1,30 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+{% block content_title 'Generation des comptes utilisateurs' %}
+{% block main %}
+    <div class="datagrid-container mt-5">
+        <table class="table datagrid datagrid-table table-striped table-hover">
+            <thead>
+            <th>ID</th>
+            <th>Type</th>
+            <th>Parent</th>
+            <th>Nom</th>
+            <th class="actions">Action</th>
+            </thead>
+            <tbody>
+            {% for instance in instances %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ instance.type.value }}</td>
+                    <td>{{ instance.instanceParent? instance.instanceParent.sigle? instance.instanceParent.sigle : instance.instanceParent.nom }}</td>
+                    <td>{{ instance.nom }}</td>
+                    <td class="text-center">
+                        <a href="{{ path('admin_generate_compte_add', {'slug': instance.slug}) }}"><i class="fa-solid fa-key"></i></a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+
