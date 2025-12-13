@@ -24,6 +24,9 @@ class Organe
     #[Assert\Unique()]
     private ?string $slug = null;
 
+    #[ORM\Column(length: 20, nullable: true)]
+    private ?string $role = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -56,6 +59,18 @@ class Organe
     public function __toString(): string
     {
         return $this->getNom();
+    }
+
+    public function getRole(): ?string
+    {
+        return $this->role;
+    }
+
+    public function setRole(?string $role): static
+    {
+        $this->role = $role;
+
+        return $this;
     }
 
 }

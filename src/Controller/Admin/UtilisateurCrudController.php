@@ -41,19 +41,49 @@ class UtilisateurCrudController extends AbstractCrudController
         return [
             IdField::new('id')->hideOnForm(),
 
-            FormField::addColumn('col-md-6 mt-3 mt-3 mt-md-5'),
-            FormField::addPanel('Information du compte'),
-            FormField::addPanel()
-                ->setFormType(UserEmbeddedType::class),
-
             FormField::addColumn('col-md-6 mt-3 mt-md-5'),
-            FormField::addPanel('Affectation'),
+            FormField::addPanel('Identité'),
             AssociationField::new('instance')
-                ->setLabel('Instance'),
-            AssociationField::new('organe')
-                ->setLabel('Organe'),
+                ->setLabel('Instance')
+                ->setFormTypeOptions([
+                    'attr' => ['autocomplete' => 'off']
+                ])
+                ->setRequired(true),
+            TextField::new('nom')
+                ->setLabel('Nom')
+                ->setFormTypeOptions([
+                    'attr' => ['autocomplete' => 'off']
+                ])
+                ->setRequired(true),
+            TextField::new('prenom')
+                ->setLabel('Prenoms')
+                ->setRequired(true),
             EmailField::new('email')
-                ->setLabel('Adresse email'),
+                ->setLabel('Adresse email')
+                ->setFormTypeOptions([
+                    'attr' => ['autocomplete' => 'off']
+                ]),
+
+
+            FormField::addColumn('col-md-6 mt-3 mt-3 mt-md-5'),
+
+            FormField::addPanel('Information du compte'),
+            AssociationField::new('organe')
+                ->setLabel('Organe')
+                ->setRequired(true),
+            TextField::new('username')
+                ->setLabel('Nom d\'utilisateur')
+                ->setFormTypeOptions([
+                    'attr' => ['autocomplete' => 'off']
+                ])
+                ->setRequired(true),
+            TextField::new('userpass')
+                ->setLabel('Mot de passe')
+                ->onlyOnForms()
+                ->setPermission('ROLE_AT')
+                ->setFormTypeOptions([
+                    'attr' => ['autocomplete' => 'off']
+                ]),
             BooleanField::new('actif')
                 ->setLabel('Actif'),
 

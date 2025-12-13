@@ -52,19 +52,22 @@ class DashboardController extends AbstractDashboardController
 
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class); <i class=""></i>
 
-        if ($this->isGranted('ROLE_ADMIN')){
+        if ($this->isGranted('ROLE_AT')){
 
             yield MenuItem::section('Paramètre');
             yield MenuItem::subMenu('Instances', 'fas fa-layer-group')->setSubItems([
                 MenuItem::linkToCrud('Liste des instances', 'fas fa-list', Instance::class),
                 MenuItem::linkToRoute('Importer des instances', 'fas fa-file-import', 'admin_import_excel_instances')
+                            ->setPermission('ROLE_ADMIN')
             ]);
-            yield MenuItem::linkToCrud('Organes', 'fas fa-layer-group', Organe::class);
+            yield MenuItem::linkToCrud('Organes', 'fas fa-layer-group', Organe::class)
+                            ->setPermission('ROLE_ADMIN');
 
             yield MenuItem::section('Sécurité');
             yield MenuItem::subMenu('Comptes', 'fa-solid fa-user-lock')->setSubItems([
                 MenuItem::linkToCrud('Liste des comptes', 'fas fa-list', Utilisateur::class),
                 MenuItem::linkToRoute('Générer des comptes', 'fa-solid fa-user-clock', 'admin_compte_generation')
+                            ->setPermission('ROLE_SUPER_ADMIN')
             ]);
             yield MenuItem::linkToCrud('Users', 'fa-solid fa-user-shield', User::class)
                 ->setPermission('ROLE_SUPER_ADMIN');

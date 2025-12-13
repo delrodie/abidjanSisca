@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Organe;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
@@ -40,6 +41,15 @@ class OrganeCrudController extends AbstractCrudController
                 ->setFormTypeOptions([
                     'attr' => ['autocomplete' => "off"]
                 ]),
+            ChoiceField::new('role')
+                ->setChoices([
+                    'ROLE_ADMIN' => 'ROLE_ADMIN',
+                    'ROLE_AT' => 'ROLE_AT',
+                    'ROLE_REGION' => 'ROLE_REGION',
+                    'ROLE_DISTRICT' => 'ROLE_DISTRICT',
+                    'ROLE_GROUPE' => 'ROLE_GROUPE',
+                    'ROLE_USER' => 'ROLE_USER',
+                ])
         ];
     }
 

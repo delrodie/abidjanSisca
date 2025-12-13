@@ -4,8 +4,22 @@ namespace App\Entity;
 
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
+#[UniqueEntity(
+    fields: ['nom', 'prenom', 'email'],
+    message: 'Ce compte utilisateur (nom, prenom, email) existe déjà.'
+)]
+#[UniqueEntity(
+    fields: ['email'],
+    message: 'Cette adresse email existe déjà.'
+)]
+#[UniqueEntity(
+    fields: ['username'],
+    message: 'Ce nom utilisateur existe déjà.'
+)]
+
 class Utilisateur
 {
     #[ORM\Id]
@@ -30,6 +44,18 @@ class Utilisateur
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $email = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $username = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $userpass = null;
+
+    #[ORM\Column(length: 72, nullable: true)]
+    private ?string $nom = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $prenom = null;
 
     public function getId(): ?int
     {
@@ -104,6 +130,54 @@ class Utilisateur
     public function setEmail(?string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function setUsername(?string $username): static
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+    public function getUserpass(): ?string
+    {
+        return $this->userpass;
+    }
+
+    public function setUserpass(?string $userpass): static
+    {
+        $this->userpass = $userpass;
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
+
+    public function setNom(?string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(?string $prenom): static
+    {
+        $this->prenom = $prenom;
 
         return $this;
     }

@@ -16,6 +16,20 @@ class UtilisateurRepository extends ServiceEntityRepository
         parent::__construct($registry, Utilisateur::class);
     }
 
+    public function findByQuey(string $nom, string $prenom, string $email, string $username)
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.nom = :nom AND c.prenom = :prenom')
+            ->orWhere('c.email = :email OR c.username = :username')
+            ->setParameter('nom', $nom)
+            ->setParameter('prenom', $prenom)
+            ->setParameter('email', $email)
+            ->setParameter('username', $username)
+            ->setMaxResults(1)
+            ->getQuery()->getOneOrNullResult()
+            ;
+    }
+
     //    /**
     //     * @return Utilisateur[] Returns an array of Utilisateur objects
     //     */
