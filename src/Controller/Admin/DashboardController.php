@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Activite;
 use App\Entity\Instance;
 use App\Entity\Organe;
 use App\Entity\User;
@@ -57,17 +58,20 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
 
-        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class); <i class=""></i>
+        // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
+        // <i class="fa-solid fa-tents"></i>
+
+        yield MenuItem::section('Gestion');
+        yield MenuItem::linkToCrud('Activités', 'fa-solid fa-tents', Activite::class);
 
         if ($this->isGranted('ROLE_AT')){
-
             yield MenuItem::section('Paramètre');
-            yield MenuItem::subMenu('Instances', 'fas fa-layer-group')->setSubItems([
+            yield MenuItem::subMenu('Instances', 'fa-regular fa-building')->setSubItems([
                 MenuItem::linkToCrud('Liste des instances', 'fas fa-list', Instance::class),
                 MenuItem::linkToRoute('Importer des instances', 'fas fa-file-import', 'admin_import_excel_instances')
                             ->setPermission('ROLE_ADMIN')
             ]);
-            yield MenuItem::linkToCrud('Organes', 'fas fa-layer-group', Organe::class)
+            yield MenuItem::linkToCrud('Organes', 'fa-solid fa-chart-diagram', Organe::class)
                             ->setPermission('ROLE_ADMIN');
 
             yield MenuItem::section('Sécurité');

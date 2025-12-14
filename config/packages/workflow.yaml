@@ -1,0 +1,55 @@
+framework:
+    workflows:
+        activite_workflow:
+            type: 'state_machine'
+            supports:
+                - App\Entity\Activite
+            marking_store:
+                type: 'method'
+                property: 'statut'
+
+            places:
+                - brouillon
+                - attente_district
+                - approuve_district
+                - attente_region
+                - validee
+                - rejetee
+
+            transitions:
+                # Création par un GROUPE
+                soumettre_groupe:
+                    from: brouillon
+                    to: attente_district
+
+                # Approbation DISTRICT
+                approuver_district:
+                    from: attente_district
+                    to: attente_region
+
+                # Approbation DISTRICT
+                rejeter_district:
+                    from: attente_district
+                    to: rejetee
+
+                # Création par DISTRICT ou DEPARTEMENT
+                soumettre_direct_region:
+                    from: brouillon
+                    to: attente_region
+
+                # Validation District
+                valider_district:
+                    from: attente_district
+                    to: attente_region
+
+                # Validation Région
+                valider_region:
+                    from: attente_region
+                    to: validee
+
+                # Rejet possible à tout moment
+                rejeter_region:
+                    from:
+                        - attente_district
+                        - attente_region
+                    to: rejetee

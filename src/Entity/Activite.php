@@ -5,9 +5,15 @@ namespace App\Entity;
 use App\Repository\ActiviteRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: ActiviteRepository::class)]
+#[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(
+    fields: ['denomination', 'lieu', 'dateDebut'],
+    message: 'Cette activité existe déjà.'
+)]
 class Activite
 {
     #[ORM\Id]
@@ -49,7 +55,7 @@ class Activite
     private ?array $partiePrenante = null;
 
     #[ORM\Column(length: 32, nullable: true)]
-    private ?string $statut = null;
+    private ?string $statut = 'brouillon';
 
     #[ORM\ManyToOne]
     private ?Utilisateur $auteur = null;
@@ -83,6 +89,9 @@ class Activite
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updateAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -363,5 +372,35 @@ class Activite
         $this->reference = $reference;
 
         return $this;
+    }
+
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function onCreate(): void
+    {
+        $this->createdAt = new \DateTimeImmutable();
+        $this->updateAt = new \DateTimeImmutable();
+
+        if (empty($this->slug)){
+            $this->slug = Uuid::v4();
+        }
+    }
+
+    #[ORM\PreUpdate]
+    public function onUpdate(): void
+    {
+        $this->updateAt = new \DateTimeImmutable();
     }
 }
