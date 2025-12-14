@@ -12,7 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 
-#[AdminDashboard(routePath: '/admin', routeName: 'admin')]
+#[AdminDashboard(routePath: '/admin', routeName: 'admin_dashboard')]
 class DashboardController extends AbstractDashboardController
 {
     public function index(): Response
@@ -43,7 +43,14 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('SISCA');
+            ->setTitle('
+                    <div class="d-flex align-items-center">
+                        <img src="logo.png" style="width: 50px;" class="img-fluid">
+                        <h3 class="fw-bold mt-2" style="color: #3D2872">SISCA</h3>
+                    </div>
+                ')
+            ->setFaviconPath('logo.png')
+            ;
     }
 
     public function configureMenuItems(): iterable

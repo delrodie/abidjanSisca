@@ -1,4 +1,5 @@
 {% extends 'base.html.twig' %}
+<link rel="shortcut icon" href="{{ asset('logo.png') }}">
 
 {% block title %}Log in!{% endblock %}
 
@@ -13,6 +14,9 @@
                 You are logged in as {{ app.user.userIdentifier }}, <a href="{{ logout_path() }}">Logout</a>
             </div>
         {% endif %}
+
+
+
 
         <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
         <label for="username">Username</label>
