@@ -58,11 +58,15 @@ class DashboardController extends AbstractDashboardController
     {
         yield MenuItem::linkToDashboard('Tableau de bord', 'fa fa-home');
 
+        yield MenuItem::linkToCrud('Agenda', 'fa fa-calendar', Activite::class)
+            ->setController(AgendaCrudController::class);
+
         // yield MenuItem::linkToCrud('The Label', 'fas fa-list', EntityClass::class);
         // <i class="fa-solid fa-tents"></i>
 
         yield MenuItem::section('Gestion');
-        yield MenuItem::linkToCrud('Activités', 'fa-solid fa-tents', Activite::class);
+        yield MenuItem::linkToCrud('Activités', 'fa-solid fa-tents', Activite::class)
+            ->setController(ActiviteCrudController::class);
 
         if ($this->isGranted('ROLE_AT')){
             yield MenuItem::section('Paramètre');
