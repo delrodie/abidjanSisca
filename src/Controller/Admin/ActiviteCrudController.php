@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FilterCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
@@ -32,6 +33,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\Workflow\WorkflowInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 
 #[AllowDynamicProperties]
 class ActiviteCrudController extends AbstractCrudController
@@ -60,6 +62,7 @@ class ActiviteCrudController extends AbstractCrudController
             ->setPageTitle('new', "Enregistrement d'une nouvelle activité")
             ->setPageTitle('edit', fn(Activite $activite) => sprintf('Modification de <b>%s</b>', $activite->getDenomination()))
             ->overrideTemplate('crud/detail', 'admin/activite_detail.html.twig')
+//            ->overrideTemplate('crud/index', 'admin/activite_index.html.twig')
             ->setAutofocusSearch(true)
             ->setDefaultSort([
                 'dateDebut' => 'ASC',
@@ -239,6 +242,37 @@ class ActiviteCrudController extends AbstractCrudController
         return $queryBuilder;
     }
 
+    public function configureResponseParameters(KeyValueStore $responseParameters): KeyValueStore
+    {
+        if ($responseParameters->get('pageName') === Crud::PAGE_INDEX) {
+            $entities = $responseParameters->get('entities');
+
+            // Créer un mapping de couleurs pour chaque date unique
+            $dateColors = [];
+            $colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#e67e22', '#34495e'];
+            $colorIndex = 0;
+
+            foreach ($entities as $entity) {
+                $dateDebut = $entity->getInstance()->getDateDebut();
+                if ($dateDebut && !isset($dateColors[$dateDebut->format('Y-m-d')])) {
+                    $dateColors[$dateDebut->format('Y-m-d')] = $colors[$colorIndex % count($colors)];
+                    $colorIndex++;
+                }
+            }
+
+            $responseParameters->set('dateColors', $dateColors);
+        }
+
+        return $responseParameters;
+    }
+
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets
+            ->addCssFile('styles/admin.css')
+            ->addJsFile('js/admin.js')
+            ;
+    }
 
     #[AdminRoute(path: '/soumission', name:'admin_activite_soumission')]
     public function soumettreActivite(AdminContext $context)

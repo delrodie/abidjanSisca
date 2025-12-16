@@ -1,0 +1,16 @@
+{% extends '@EasyAdmin/crud/index.html.twig' %}
+
+{% block table_body %}
+    {% for entity in entities %}
+        {% set date_debut = attribute(entity.instance, 'dateDebut') %}
+        {% set color = date_debut ? dateColors[date_debut|date('Y-m-d')] ?? '#95a5a6' : '#95a5a6' %}
+
+        <tr data-id="{{ entity.primaryKeyValueAsString }}" style="border-left: 4px solid {{ color }};">
+            {% for field in entity.fields %}
+                <td data-column="{{ field.property }}" class="{{ field.property == sort_field_name ? 'sorted' }} text-{{ field.textAlign }} {{ field.cssClass }}" dir="{{ ea.i18n.textDirection }}">
+                    {{ include(field.templatePath, { field: field, entity: entity }, with_context = false) }}
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+{% endblock %}
