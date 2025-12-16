@@ -1,0 +1,135 @@
+{% extends '@EasyAdmin/crud/detail.html.twig' %}
+{% block content %}
+    {% set activite = entity.instance %}
+    <div class="container mt-3">
+        <h4 class="h4 mb-5">{{ activite.denomination }}</h4>
+        <div class="row">
+            <div class="col-md-4 mt-3">
+                <small class="text-muted">Référence :</small>
+                <div class="fw-semibold"><span class="text-bg-primary px-3 py-1">{{ entity.instance.reference }}</span> </div>
+            </div>
+            <div class="col-md-8 mt-3">
+                <small class="text-muted">Instance:</small>
+                <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.instance? activite.instance.nom }}</div>
+            </div>
+            <div class="col-md-6 mt-3">
+                <small class="text-muted">Dénomination :</small>
+                <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.denomination }}</div>
+            </div>
+            <div class="col-md-6 mt-3">
+                <small class="text-muted">Lieu de l'activité :</small>
+                <div class="fw-semibold text-bg-light px-3 py-1"><span class="">{{ activite.lieu }}</span> </div>
+            </div>
+            <div class="col-12 mt-3">
+                <small class="text-muted">Objectifs de l'activité:</small>
+                <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.objectif|raw }}</div>
+            </div>
+            <div class="col-12 mt-3">
+                <small class="text-muted">Contenu de l'activité :</small>
+                <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.contenu|raw }}</div>
+            </div>
+            <div class="col-md-4 mt-3">
+                <small class="text-muted">Période :</small>
+                <div class="fw-bold">
+                    <span class="text-bg-info px-3 py-1">{{ activite.dateDebut|date('d/m/Y') }} - {{ activite.dateFin|date('d/m/Y') }}</span>
+                </div>
+            </div>
+            <div class="col-md-4 mt-3">
+                <small class="text-muted">Qualités des participants / cibles :</small>
+                <div class="fw-bold text-bg-light px-3 py-1">
+                    <ul>
+                        {% for cible in activite.cible %}
+                            <li>{{ cible }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4 mt-3">
+                <small class="text-muted">Partie prénantes impactantes pour la réalisation de l'activité :</small>
+                <div class="fw-semibold text-bg-light px-3 py-1">
+                    <ul>
+                        {% for partie in activite.partiePrenante %}
+                            <li>{{ partie }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4 mt-3">
+                <small class="text-muted">Responsable :</small>
+                <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.responsable }}</div>
+            </div>
+            <div class="col-md-5 mt-3">
+                <small class="text-muted">Auteur :</small>
+                <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.auteur? activite.auteur.nom }} {{ activite.auteur? activite.auteur.prenom }}</div>
+                <div class="fst-italic text-bg-light px-3 py-1">({{ activite.auteur? activite.auteur.organe.nom }})</div>
+            </div>
+            <div class="col-md-3 mt-3">
+                <small class="text-muted">Statut :</small>
+                <div class="fw-semibold">
+                    {% if activite.statut == 'validee' %}
+                        <div class="badge text-bg-success">Validée</div>
+                    {% elseif activite.statut == 'attente_district' %}
+                        <div class="badge text-bg-warning">Attente district</div>
+                    {% elseif activite.statut == 'approuve_district' %}
+                        <div class="badge text-bg-info">Attente d'approbation du district</div>
+                    {% elseif activite.statut == 'attente_region' %}
+                        <div class="badge text-bg-warning">Attente région</div>
+                    {% elseif activite.statut == 'rejetee' %}
+                        <div class="badge text-bg-danger">Rejetée</div>
+                    {% else %}
+                        <div class="badge text-bg-secondary">Brouillon</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% if activite.approbateurDistrict %}
+                <div class="col-md-8 mt-3">
+                    <small class="text-muted">District approbateur </small>
+                    <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.approbateurDistrict.nom }} {{ activite.approbateurDistrict.prenom }}</div>
+                    <div class="fst-italic text-bg-light px-3 py-1">({{ activite.approbateurDistrict.organe.nom }})</div>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <small class="text-muted">Date d'approbation</small>
+                    <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.approbationDistrictAt|date('d-m-Y H:i:s')}}</div>
+                </div>
+            {% endif %}
+            {% if activite.approbateurRegion %}
+                <div class="col-md-8 mt-3">
+                    <small class="text-muted">Région approbatrice </small>
+                    <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.approbateurRegion.nom }} {{ activite.approbateurRegion.prenom }}</div>
+                    <div class="fst-italic text-bg-light px-3 py-1">({{ activite.approbateurRegion.organe.nom }})</div>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <small class="text-muted">Date d'approbation</small>
+                    <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.approbationRegionAt|date('d-m-Y H:i:s')}}</div>
+                </div>
+            {% endif %}
+            {% if activite.commentaireValidation %}
+                <div class="col-12 mt-3">
+                    <small class="text-muted">Commentaire validation</small>
+                    <div class="fw-semibold text-bg-lignt px-3 py-1">{{ activite.commentaireValidation|raw }}</div>
+                </div>
+            {% endif %}
+            {% if activite.motifRejet %}
+                <div class="col-12 mt-3">
+                    <small class="text-muted">Motif du rejet</small>
+                    <div class="fw-semibold text-bg-lignt px-3 py-1">{{ activite.motifRejet|raw }}</div>
+                </div>
+            {% endif %}
+            <div class="col-md-4 mt-5">
+                <small class="text-muted">Date de création:</small>
+                <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.createdAt|date('d-m-Y H:i:s') }}</div>
+            </div>
+            <div class="col-md-4 mt-5">
+                <small class="text-muted">Date de modification :</small>
+                <div class="fw-semibold text-bg-light px-3 py-1">{{ activite.updateAt|date('d-m-Y H:i:s') }}</div>
+            </div>
+            <div class="col-md-4 mt-5"></div>
+        </div>
+        <div class="mt-5 text-end">
+            <a href="{{ ea_url().setAction('index') }}" class="btn btn-secondary rounded-0">
+                <i class="fa fa-arrow-left"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+
+{% endblock %}

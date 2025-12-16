@@ -35,6 +35,7 @@ class UserCrudController extends AbstractCrudController
             ->setPageTitle('edit', fn(User $user) => sprintf('Modification de <b>%s</b>', $user->getUserIdentifier()))
 
             ->setAutofocusSearch(true)
+            ->setDefaultSort(['lastConnectedAt' => 'DESC'])
             ;
     }
 

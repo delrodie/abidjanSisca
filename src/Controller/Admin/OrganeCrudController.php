@@ -44,6 +44,7 @@ class OrganeCrudController extends AbstractCrudController
             ChoiceField::new('role')
                 ->setChoices([
                     'ROLE_ADMIN' => 'ROLE_ADMIN',
+                    'ROLE_PSEUDO_ADMIN' => 'ROLE_PSEUDO_ADMIN',
                     'ROLE_AT' => 'ROLE_AT',
                     'ROLE_REGION' => 'ROLE_REGION',
                     'ROLE_DISTRICT' => 'ROLE_DISTRICT',

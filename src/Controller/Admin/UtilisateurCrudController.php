@@ -62,7 +62,8 @@ class UtilisateurCrudController extends AbstractCrudController
                 ->setLabel('Adresse email')
                 ->setFormTypeOptions([
                     'attr' => ['autocomplete' => 'off']
-                ]),
+                ])
+                ->hideOnIndex(),
 
 
             FormField::addColumn('col-md-6 mt-3 mt-3 mt-md-5'),

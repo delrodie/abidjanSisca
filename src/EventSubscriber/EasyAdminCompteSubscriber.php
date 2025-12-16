@@ -10,6 +10,7 @@ use App\Repository\UtilisateurRepository;
 use Doctrine\DBAL\Exception\ConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityPersistedEvent;
+use EasyCorp\Bundle\EasyAdminBundle\Event\BeforeEntityUpdatedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -32,6 +33,7 @@ class EasyAdminCompteSubscriber implements EventSubscriberInterface
     {
         return [
             BeforeEntityPersistedEvent::class => 'userCreate',
+            BeforeEntityUpdatedEvent::class => 'userUpdate',
         ];
     }
 
@@ -48,7 +50,7 @@ class EasyAdminCompteSubscriber implements EventSubscriberInterface
         $user->setPassword(
             $this->passwordHasher->hashPassword($user, $entity->getUserpass())
         );
-        $user->setRoles($this->determineRole($entity->getOrgane()));
+        $user->setRoles($this->determineRole($entity->getOrgane()->getRole()));
 
         $this->entityManager->persist($user);
 
@@ -61,6 +63,30 @@ class EasyAdminCompteSubscriber implements EventSubscriberInterface
 
     }
 
+    public function userUpdate(BeforeEntityUpdatedEvent $event): void
+    {
+        $entity = $event->getEntityInstance();
+        if (!$entity instanceof Utilisateur){
+            return;
+        }
+
+        if (!$entity->getUser() instanceof User){
+            return;
+        }
+
+        $user = $entity->getUser();
+        $user->setUsername($entity->getUsername());
+        $user->setPassword(
+            $this->passwordHasher->hashPassword($user, $entity->getUserpass())
+        );
+        $user->setRoles($this->determineRole($entity->getOrgane()->getRole()));
+
+        // Mise a jour Utilisateur
+        $entity->setUser($user);
+
+        $this->entityManager->flush();
+    }
+
     /**
      * Determination des roles
      * @param string $organe
@@ -70,6 +96,7 @@ class EasyAdminCompteSubscriber implements EventSubscriberInterface
     {
         return match ($organe) {
             'ROLE_ADMIN' => ['ROLE_USER', 'ROLE_ADMIN'],
+            'ROLE_PSEUDO_ADMIN' => ['ROLE_USER', 'ROLE_PSEUDO_ADMIN'],
             'ROLE_AT' => ['ROLE_USER', 'ROLE_AT'],
             'ROLE_DISTRICT' => ['ROLE_USER', 'ROLE_DISTRICT'],
             'ROLE_GROUPE' => ['ROLE_USER', 'ROLE_GROUPE'],

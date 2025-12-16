@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use AllowDynamicProperties;
 use App\Entity\Activite;
+use App\Enum\InstanceType;
 use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
@@ -58,8 +59,12 @@ class ActiviteCrudController extends AbstractCrudController
             ->setPageTitle('index', 'Liste des activités')
             ->setPageTitle('new', "Enregistrement d'une nouvelle activité")
             ->setPageTitle('edit', fn(Activite $activite) => sprintf('Modification de <b>%s</b>', $activite->getDenomination()))
-
+            ->overrideTemplate('crud/detail', 'admin/activite_detail.html.twig')
             ->setAutofocusSearch(true)
+            ->setDefaultSort([
+                'dateDebut' => 'ASC',
+                'dateFin' => 'ASC',
+            ])
             ;
     }
 
@@ -67,9 +72,9 @@ class ActiviteCrudController extends AbstractCrudController
     {
         return [
             IdField::new('id')->onlyOnIndex(),
-            TextField::new('reference')->hideOnForm(),
 
             FormField::addColumn('col-md-6 mt-3 mt-md-5'),
+            TextField::new('reference')->hideOnForm(),
             TextField::new('denomination')
                 ->setLabel('Dénomination de l\'activité')
                 ->setRequired(true),
@@ -162,6 +167,7 @@ class ActiviteCrudController extends AbstractCrudController
             );
 
         return $actions
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ->add(Crud::PAGE_INDEX, $soumettre)
             ->add(Crud::PAGE_INDEX, $approuver)
             ->add(Crud::PAGE_INDEX, $valider)
@@ -173,8 +179,13 @@ class ActiviteCrudController extends AbstractCrudController
     {
         $queryBuilder = parent::createIndexQueryBuilder($searchDto, $entityDto, $fields, $filters);
         $user = $this->getUser();
+
+        // Alias de l'entité principale
+        $rootAlias = $queryBuilder->getRootAliases()[0];
+
         if (null === $user || $this->security->isGranted('ROLE_AT')){
-            return $queryBuilder;
+            return $queryBuilder
+                ;
         }
 
         // Récupérer le compte associé à l'utilisateur connecté
@@ -185,8 +196,6 @@ class ActiviteCrudController extends AbstractCrudController
             return $queryBuilder;
         }
 
-        // Alias de l'entité principale
-        $rootAlias = $queryBuilder->getRootAliases()[0];
         $instanceUtilisateur = $utilisateur->getInstance();
 
         // Récupération du type de l'instance
@@ -196,7 +205,8 @@ class ActiviteCrudController extends AbstractCrudController
         if ($instanceType === 'GROUPE'){ //dd($instanceUtilisateur->getId());
             $queryBuilder
                 ->andWhere("{$rootAlias}.instance IN (:instanceId)")
-                ->setParameter('instanceId', $instanceUtilisateur->getId());
+                ->setParameter('instanceId', $instanceUtilisateur->getId())
+            ;
         }
 
         // Si l'instance de l'utilisateur est de type District
@@ -207,7 +217,8 @@ class ActiviteCrudController extends AbstractCrudController
             }
             $queryBuilder
                 ->andWhere("{$rootAlias}.instance IN (:instanceIds)")
-                ->setParameter('instanceIds', $instanceIds);
+                ->setParameter('instanceIds', $instanceIds)
+            ;
         }
 
         // Si l'instance de l'utilisateur est de type Region
@@ -222,7 +233,8 @@ class ActiviteCrudController extends AbstractCrudController
             }
             $queryBuilder
                 ->andWhere("{$rootAlias}.instance IN (:allInstanceIds)")
-                ->setParameter('allInstanceIds', $allInstanceIds);
+                ->setParameter('allInstanceIds', $allInstanceIds)
+            ;
         }
         return $queryBuilder;
     }
@@ -234,25 +246,49 @@ class ActiviteCrudController extends AbstractCrudController
         $activite = $context->getEntity()->getInstance();
         $activiteWorkflow = $this->workflows->get('activite_workflow');
 
-        // Gestion de soumission si c'est un groupe
-        if ($this->security->isGranted('ROLE_GROUPE')){
-            $activiteWorkflow->apply($activite, 'soumettre_groupe');
-        }
-
-        // Gestion des soumission si c'est un district
-        if ($this->security->isGranted('ROLE_DISTRICT'))
-        {
-            $this->activiteWorkflow->apply($activite, 'soumettre_district');
-        }
 
         // Gestion des soumissions si c'est un departement
-        if ($this->security->isGranted('ROLE_REGION'))
+        if (
+            $this->security->isGranted('ROLE_REGION') ||
+            $this->security->isGranted('ROLE_AT') ||
+            $this->security->isGranted('ROLE_PSEUDO_ADMIN') ||
+            $this->security->isGranted('ROLE_ADMIN')
+        )
         {
-            $this->activiteWorkflow->apply($activite, 'soumettre_direct_region');
+            if ($activiteWorkflow->can($activite, 'soumettre_direct_region')) {
+                $activiteWorkflow->apply($activite, 'soumettre_direct_region');
+                $this->addFlash("success", "Activité soumise à la région avec succès!");
+            }else{
+                $this->addFlash('danger', "Impossible de soumettre : transition 'soumettre_direct_region' non disponible.");
+            }
+        }
+
+        // Gestion des soumissions si c'est un district
+        elseif ($this->security->isGranted('ROLE_DISTRICT'))
+        {
+            if ($activiteWorkflow->can($activite, 'soumettre_district')) {
+                $activiteWorkflow->apply($activite, 'soumettre_district');
+                $this->addFlash('success', "Activité soumise à la région avec succès");
+            }else{
+                $this->addFlash('danger', "Impossible de soumettre : transition 'soumettre_region' non disponible");
+            }
+        }
+
+        // Gestion de soumission si c'est un groupe
+        elseif ($this->security->isGranted('ROLE_GROUPE')){
+            if ($activiteWorkflow->can($activite, 'soumettre_groupe')) {
+                $activiteWorkflow->apply($activite, 'soumettre_groupe');
+                $this->addFlash('success', "Activité soumise au District avec succès!");
+            }else{
+                $this->addFlash('danger', "Impossible de soumettre : transition 'soumettre_district' non disponible.");
+            }
+        }
+        else{
+            $this->addFlash('danger', "Vos accès ne vous permettent pas de faire la soumission");
         }
 
         $this->entityManager->flush();
-        $this->addFlash('success', "Activité soumise avec succès!");
+//        $this->addFlash('success', "Activité soumise avec succès!");
 
         return $this->redirect($context->getRequest()->headers->get('referer'));
     }
@@ -336,14 +372,19 @@ class ActiviteCrudController extends AbstractCrudController
         }
 
         // Rejet au niveau de la région
-        if ($this->activiteWorkflow->can($activite, 'rejeter_region')){
+        elseif ($this->activiteWorkflow->can($activite, 'rejeter_region')){
             $this->activiteWorkflow->apply($activite, 'rejeter_region');
             $activite->setApprobateurRegion($utilisateur);
             $activite->setApprobationRegionAt($datetime);
         }
 
+        else{
+            $this->addFlash('danger', "Impossible de rejeter cette activité");
+            return $this->redirect($context->getRequest()->headers->get('referer'));
+        }
+
         $this->entityManager->flush();
-        $this->addFlash('success', "Activité réjétée");
+        $this->addFlash('success', "Activité rejetée avec succès!");
         return $this->redirect($context->getRequest()->headers->get('referer'));
     }
 

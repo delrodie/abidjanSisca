@@ -22,12 +22,17 @@ framework:
                     from: brouillon
                     to: attente_district
 
+                # Création par un DISTRICT
+                soumettre_district:
+                    from: brouillon
+                    to: attente_region
+
                 # Approbation DISTRICT
                 approuver_district:
                     from: attente_district
                     to: attente_region
 
-                # Approbation DISTRICT
+                # Rejet DISTRICT
                 rejeter_district:
                     from: attente_district
                     to: rejetee

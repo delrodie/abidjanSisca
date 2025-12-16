@@ -19,6 +19,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use phpDocumentor\Reflection\Types\Static_;
 
 class AgendaCrudController extends AbstractCrudController
 {
@@ -30,7 +31,8 @@ class AgendaCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-//            ->showEntityActionsInlined()
+            ->overrideTemplate('crud/detail', 'admin/agenda_detail.html.twig')
+            ->setPaginatorPageSize(10)
             ;
     }
 
@@ -57,7 +59,13 @@ class AgendaCrudController extends AbstractCrudController
 
         return $actions
             ->disable(Action::NEW, Action::EDIT, Action::DELETE)
-            ->add(Crud::PAGE_INDEX, Action::DETAIL);
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
+            ->update(Crud::PAGE_DETAIL, Action::INDEX,
+                static fn(Action $action) => $action
+                    ->setIcon('fa fa-arrow-left')
+                    ->setLabel('Retour à la liste')
+            )
+            ;
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
@@ -67,9 +75,12 @@ class AgendaCrudController extends AbstractCrudController
         $rootAlias = $queryBuilder->getRootAliases()[0];
 
         return $queryBuilder
+                ->andWhere("{$rootAlias}.statut = (:statut)")
                 ->andWhere("{$rootAlias}.dateDebut >= (:today)")
                 ->setParameter('today', new \DateTime('now'))
+                ->setParameter('statut', 'validee')
                 ->orderBy("{$rootAlias}.dateDebut", "ASC")
+                ->addOrderBy("{$rootAlias}.dateFin", "ASC")
             ;
     }
 

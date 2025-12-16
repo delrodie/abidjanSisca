@@ -4,7 +4,8 @@ security:
         ROLE_DISTRICT: ROLE_GROUPE
         ROLE_REGION: ROLE_DISTRICT
         ROLE_AT: ROLE_REGION
-        ROLE_ADMIN: ROLE_AT
+        ROLE_PSEUDO_ADMIN: ROLE_AT
+        ROLE_ADMIN: ROLE_PSEUDO_ADMIN
         ROLE_SUPER_ADMIN: [ ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH ]
 
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
