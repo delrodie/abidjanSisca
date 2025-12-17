@@ -37,7 +37,7 @@ class AdminImportExcelController extends AbstractController
                     }
                 }
 
-                return $this->redirectToRoute('admin_instance_index');
+                return $this->redirectToRoute('admin_dashboard_instance_index');
             } catch(\Throwable $e){
                 $this->addFlash("error", "Erreur d'importation: {$e->getMessage()}");
             }
