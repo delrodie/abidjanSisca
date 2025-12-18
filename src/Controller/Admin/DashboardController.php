@@ -9,16 +9,24 @@ use App\Entity\User;
 use App\Entity\Utilisateur;
 use App\Enum\InstanceType;
 use App\Repository\ActiviteRepository;
+use App\Repository\InstanceRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use Symfony\UX\Chartjs\Model\Chart;
 
 #[AdminDashboard(routePath: '/admin', routeName: 'admin_dashboard')]
 class DashboardController extends AbstractDashboardController
 {
-    public function __construct(private readonly ActiviteRepository $activiteRepository)
+    public function __construct(
+        private readonly ActiviteRepository $activiteRepository,
+        private readonly InstanceRepository $instanceRepository,
+        private readonly ChartBuilderInterface $chartBuilder,
+    )
     {
     }
 
@@ -60,7 +68,8 @@ class DashboardController extends AbstractDashboardController
               'activiteGroupe' => $activiteGroupe,
               'nonDefini' => $nonDefini,
               'activiteAVenir' => $activiteAVenir,
-              'activitePassee' => $activitePasee
+              'activitePassee' => $activitePasee,
+              'chart' => $this->activiteChartJs()
           ]);
     }
 
@@ -112,6 +121,50 @@ class DashboardController extends AbstractDashboardController
 
         }
 
+    }
+
+    public function configureAssets(): Assets
+    {
+        return parent::configureAssets()
+            ->addAssetMapperEntry('app')
+            ;
+    }
+
+    public function activiteChartJs(): Chart
+    {
+        $region = $this->instanceRepository->findOneBy(['nom' => 'Abidjan']);
+        $data = $this->activiteRepository->countActivitiesByMonthForRegion($region);
+
+        // 3. Formater pour Chart.js
+        $labels = [];
+        $dataset = [];
+        foreach ($data as $row) {
+            $labels[] = $row['month']; // Format YYYY-MM
+            $dataset[] = $row['count'];
+        }
+
+        $chart = $this->chartBuilder->createChart(Chart::TYPE_BAR);
+        $chart->setData([
+            'labels' => $labels,
+            'datasets' => [
+                [
+                    'label' => 'Activités par mois',
+                    'backgroundColor' => 'rgb(61, 40, 114)',
+                    'data' => $dataset,
+                ],
+            ],
+        ]);
+
+        $chart->setOptions([
+            'maintainAspectRatio' => false,
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                ],
+            ],
+        ]);
+
+        return $chart;
     }
 
 

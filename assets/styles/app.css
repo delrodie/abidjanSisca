@@ -7,7 +7,7 @@
 
 body{
     font-family: var(--font-familly), serif;
-    background: rgba(61, 40, 114, 0.1);
+    /*background: rgba(61, 40, 114, 0.1);*/
 }
 
 .intro h1{

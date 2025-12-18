@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Activite;
+use App\Entity\Instance;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -25,6 +26,26 @@ class ActiviteRepository extends ServiceEntityRepository
             ->setParameter('statut', $statut)
             ->getQuery()->getResult()
             ;
+    }
+
+    // src/Repository/ActiviteRepository.php
+
+    public function countActivitiesByMonthForRegion(Instance $region): array
+    {
+        return $this->createQueryBuilder('a')
+            ->select("SUBSTRING(a.dateDebut, 1, 7) as month, COUNT(a.id) as count")
+            ->join('a.instance', 'i')
+            // On cherche l'instance elle-même (la Région)
+            // OU son parent (District -> Région)
+            // OU le parent du parent (Groupe -> District -> Région)
+            ->leftJoin('i.instanceParent', 'p')
+            ->leftJoin('p.instanceParent', 'gp')
+            ->where('i = :region OR p = :region OR gp = :region')
+            ->setParameter('region', $region)
+            ->groupBy('month')
+            ->orderBy('month', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     //    /**
