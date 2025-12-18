@@ -16,6 +16,17 @@ class ActiviteRepository extends ServiceEntityRepository
         parent::__construct($registry, Activite::class);
     }
 
+    public function findByStatut(string $statut)
+    {
+        return $this->createQueryBuilder('a')
+            ->addSelect('i')
+            ->join('a.instance', 'i')
+            ->where('a.statut = :statut')
+            ->setParameter('statut', $statut)
+            ->getQuery()->getResult()
+            ;
+    }
+
     //    /**
     //     * @return Activite[] Returns an array of Activite objects
     //     */

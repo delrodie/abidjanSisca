@@ -1,4 +1,67 @@
 {% extends '@EasyAdmin/page/content.html.twig' %}
 {% block page_content %}
-    <h3 class="mb-4 mt-3 text-center">Scouts Catholiques d'Abidan - Les Requins </h3>
+    <h3 class="mb-4 fw-bold">Tableau de bord </h3>
+
+    <!--  Statistiques activités  -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-2 mt-3">
+        <div class="col">
+            <div class="card border shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h1 class="h1 fw-bold text-center">{{ totalActivite }}</h1>
+                    <small class="text-muted fw-semibold">Total activité</small>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h1 class="h1 fw-bold text-center">{{ activiteRegionale }}</h1>
+                    <small class="text-muted fw-semibold">Activités régionales</small>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h1 class="h1 fw-bold text-center">{{ activiteDistrict }}</h1>
+                    <small class="text-muted fw-semibold">Activités de districts</small>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card border shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h1 class="h1 fw-bold text-center">{{ activiteGroupe }}</h1>
+                    <small class="text-muted fw-semibold">Activités de groupes</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Statistqiues activités -->
+
+    <!-- Histogramme activités -->
+    <div class="row mt-3">
+        <div class="col-md-8 col-lg-9 mt-3">
+            <h6 class="text-muted">Histogramme</h6>
+        </div>
+        <div class="col-md-4 col-lg-3 mt-3">
+            <h6 class="text-muted">Activités</h6>
+            <div class="d-flex flex-column">
+                <div class="card border-0 shadow-sm h-100 text-center mt-3">
+                    <div class="card-body">
+                        <h3 class="fw-semibold">{{ activiteAVenir }}</h3>
+                        <small class="text-muted">Activités à venir</small>
+                    </div>
+                </div>
+
+                <div class="card h-100 shadow-sm border-0 text-center mt-5">
+                    <div class="card-body">
+                        <h3 class="fw-semibold">{{ activitePassee }}</h3>
+                        <small class="text-muted">Activités passées</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Histogramme activités -->
 {% endblock %}

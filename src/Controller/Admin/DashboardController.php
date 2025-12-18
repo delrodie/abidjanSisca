@@ -7,6 +7,8 @@ use App\Entity\Instance;
 use App\Entity\Organe;
 use App\Entity\User;
 use App\Entity\Utilisateur;
+use App\Enum\InstanceType;
+use App\Repository\ActiviteRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -16,29 +18,50 @@ use Symfony\Component\HttpFoundation\Response;
 #[AdminDashboard(routePath: '/admin', routeName: 'admin_dashboard')]
 class DashboardController extends AbstractDashboardController
 {
+    public function __construct(private readonly ActiviteRepository $activiteRepository)
+    {
+    }
+
     public function index(): Response
     {
-//        return parent::index();
+        $activites = $this->activiteRepository->findByStatut('validee');
 
-        // Option 1. You can make your dashboard redirect to some common page of your backend
-        //
-        // 1.1) If you have enabled the "pretty URLs" feature:
-        // return $this->redirectToRoute('admin_user_index');
-        //
-        // 1.2) Same example but using the "ugly URLs" that were used in previous EasyAdmin versions:
-        // $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-        // return $this->redirect($adminUrlGenerator->setController(OneOfYourCrudController::class)->generateUrl());
+        $aujourdhui = new \DateTime('today'); //dd($aujourdhui);
+        $activiteRegionale=0; $activiteDistrict=0; $activiteGroupe=0; $nonDefini=0;
+        $activiteAVenir=0; $activitePasee=0;
 
-        // Option 2. You can make your dashboard redirect to different pages depending on the user
-        //
-        // if ('jane' === $this->getUser()->getUsername()) {
-        //     return $this->redirectToRoute('...');
-        // }
+        foreach ($activites as $activite) {
+            $instanceType=$activite->getInstance()->getType();
+            $dateDebutActivite = $activite->getDateDebut();
+            $dateFinActivite = $activite->getDateFin();
 
-        // Option 3. You can render some custom template to display a proper dashboard with widgets, etc.
-        // (tip: it's easier if your template extends from @EasyAdmin/page/content.html.twig)
-        //
-         return $this->render('admin/dashboard.html.twig');
+            if ($instanceType === InstanceType::GROUPE){
+                $activiteGroupe++;
+            }elseif ($instanceType === InstanceType::DISTRICT){
+                $activiteDistrict++;
+            }elseif($instanceType === InstanceType::REGION){
+                $activiteRegionale++;
+            }else{
+                $nonDefini++;
+            }
+
+            if ($dateDebutActivite >= $aujourdhui) {
+                $activiteAVenir++;
+            }
+            if ($dateFinActivite < $aujourdhui) {
+                $activitePasee++;
+            }
+        }
+
+          return $this->render('admin/dashboard.html.twig', [
+              'totalActivite' => count($activites),
+              'activiteRegionale' => $activiteRegionale,
+              'activiteDistrict' => $activiteDistrict,
+              'activiteGroupe' => $activiteGroupe,
+              'nonDefini' => $nonDefini,
+              'activiteAVenir' => $activiteAVenir,
+              'activitePassee' => $activitePasee
+          ]);
     }
 
     public function configureDashboard(): Dashboard
