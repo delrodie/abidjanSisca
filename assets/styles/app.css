@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+
+:root{
+    --color-violet: #3D2872;
+    --font-familly: "Plus Jakarta Sans", sans-serif;
+}
+
+body{
+    font-family: var(--font-familly), serif;
+    background: rgba(61, 40, 114, 0.1);
+}
+
+.intro h1{
+    color: var(--color-violet);
+}
+
+.intro span{
+    color: var(--color-violet);
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+.intro .marque{
+    color: var(--color-violet);
+    font-weight: bold;
+    font-size: 5.5rem;
+}
+
+.color-violet{
+    color: var(--color-violet);
+}
+
+.btn-violet{
+    background: var(--color-violet);
+    color: white;
+    padding: 10px 45px;
+    border-radius:0;
+}
