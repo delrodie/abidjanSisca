@@ -15,6 +15,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\SearchMode;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -28,6 +30,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\EntityFilter;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireLocator;
@@ -63,11 +66,16 @@ class ActiviteCrudController extends AbstractCrudController
             ->setPageTitle('edit', fn(Activite $activite) => sprintf('Modification de <b>%s</b>', $activite->getDenomination()))
             ->overrideTemplate('crud/detail', 'admin/activite_detail.html.twig')
 //            ->overrideTemplate('crud/index', 'admin/activite_index.html.twig')
-            ->setAutofocusSearch(true)
+//            ->setAutofocusSearch(true)
             ->setDefaultSort([
                 'dateDebut' => 'ASC',
                 'dateFin' => 'ASC',
             ])
+//            ->setSearchFields([
+//                'instance.nom', 'denomination', 'lieu', 'cible', 'objectif', 'contenu', 'dateDebut', 'dateFin',
+//                'auteur.nom', 'reference'
+//                ])
+            ->setSearchMode(SearchMode::ALL_TERMS)
             ;
     }
 
@@ -176,6 +184,12 @@ class ActiviteCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, $valider)
             ->add(Crud::PAGE_INDEX, $rejeter)
             ;
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add(EntityFilter::new('instance', 'Filter par Instance'));
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
