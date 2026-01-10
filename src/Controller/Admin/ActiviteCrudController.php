@@ -189,7 +189,9 @@ class ActiviteCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters
-            ->add(EntityFilter::new('instance', 'Filter par Instance'));
+            ->add(EntityFilter::new('instance', 'Filter par Instance'))
+//            ->add(EntityFilter::new('auteur', 'Filter par Auteur'))
+            ;
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
